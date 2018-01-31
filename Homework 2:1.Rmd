@@ -1,8 +1,8 @@
 ---
 title: "Homework 2/1"
-author: "Elizabeth Brannon"
+author: "Elizabeth Brannon, Kesicia Dickinson, and Shane Wery"
 date: "1/31/2018"
-output: html_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -26,5 +26,7 @@ for(i in values) {
       }
 }
 
-In the first forloop, we took the i values and created an object which we named k and set to false so we could identify when it changed.
 ```
+In the first forloop, we took the i values and created an object which we named k and set to false so we could identify when it changed. 
+
+In the second forloop, for every j in the primes vector, if i equaled j then we changed k to be true. If k was false, then it printed i. 
