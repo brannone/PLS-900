@@ -25,4 +25,6 @@ for(i in values) {
       print(i)
       }
 }
+
+In the first forloop, we took the i values and created an object which we named k and set to false so we could identify when it changed.
 ```
