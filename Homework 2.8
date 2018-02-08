@@ -22,14 +22,8 @@ democ_factor_2016 <- factor(democ_factor_2016, levels=c(
 "not democ", "weak democ", "mid democ", "high democ" ))
 table(democ_2016, democ_factor_2016, useNA='always')
 
-attributes(democ_factor_2016)$'levels' <- c('ambiguous democ','mid democ','high democ')
-
-
-democ_factor_2016[which(democ_factor_2016=='not democ' & democ_factor_2016=='weak democ')] = 'not democ, ambiguous' 
-
-
 #Start here
-levels(democ_factor_2016) <- c("not democ", "ambiguous", "ambiguous", "high democ")
+levels(democ_factor_2016) <- c("not democ", "ambiguous", "ambiguous", "high democ") # redefine the low democ and mid democ categories into ambiguous. 
 
 levels(democ_factor_2016)
 
