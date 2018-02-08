@@ -22,17 +22,26 @@ democ_factor_2016 <- factor(democ_factor_2016, levels=c(
 "not democ", "weak democ", "mid democ", "high democ" ))
 table(democ_2016, democ_factor_2016, useNA='always')
 
-#change the levels to three categories
-levels(democ_factor_2016) <- c("not democ", "ambiguous", "ambiguous", "high democ")
-# redefine the low democ and mid democ categories into ambiguous. 
 
-#check the resulting levels
-levels(democ_factor_2016)
+levels(democ_factor_2016) <- c("not democ", "ambiguous", "ambiguous", "high democ") # change and redefine
 
-#Make sure the new levels translated into the data
-democ_factor_2016
+levels(democ_factor_2016) # check levels
 
-#makes sure the frequency table adjusts as well
-table(democ_2016, democ_factor_2016, useNA = 'always')
+democ_factor_2016 # check data
+
+table(democ_2016, democ_factor_2016, useNA = 'always') # check frequency table
 
 ```
+# First, we turned the democ_2016 vector into a categorical variable using the following categories:
+# 0 – not democ
+# 1-3 – weak democ
+# 4-6 – mid democ
+# 7-10 – high democ
+# We used vector manipulation operations to do that. 
+# Then, we used a factor function to tell R the order of the ordinal variable: not democ, weak democ, mid democ, high democ.
+# Next, we changed the levels to the 3 categories redifining the low democ and mid democ categories into ambiguous.
+# Afterwards, we checked the resulting levels and made sure the new levels translated into the data.
+# Finally, we made sure the frequency table adjusted.
+
+
+
