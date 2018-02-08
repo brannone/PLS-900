@@ -22,11 +22,17 @@ democ_factor_2016 <- factor(democ_factor_2016, levels=c(
 "not democ", "weak democ", "mid democ", "high democ" ))
 table(democ_2016, democ_factor_2016, useNA='always')
 
-#Start here
-levels(democ_factor_2016) <- c("not democ", "ambiguous", "ambiguous", "high democ") # redefine the low democ and mid democ categories into ambiguous. 
+#change the levels to three categories
+levels(democ_factor_2016) <- c("not democ", "ambiguous", "ambiguous", "high democ")
+# redefine the low democ and mid democ categories into ambiguous. 
 
+#check the resulting levels
 levels(democ_factor_2016)
 
+#Make sure the new levels translated into the data
 democ_factor_2016
-#end here, literally just merges them into a single level.
+
+#makes sure the frequency table adjusts as well
+table(democ_2016, democ_factor_2016, useNA = 'always')
+
 ```
