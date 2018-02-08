@@ -1,0 +1,31 @@
+---
+title: "900 Homework Assignment 2.8"
+author: "Elizabeth Brannon, Kesicia Dickinson, and Shane Wery"
+date: "2/7/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r democ}
+setwd ("/Users/elizabethbrannon/Dropbox/PLS 900")
+load("polity_vectors.rda")
+democ_factor_2016 <- democ_2016
+democ_factor_2016[which(democ_2016==0)] = 'not democ'
+democ_factor_2016[which(democ_2016 %in% 1:3)] = 'weak democ'
+democ_factor_2016[which(democ_2016 %in% 4:6)] = 'mid democ'
+democ_factor_2016[which(democ_2016 %in% 7:10)] = 'high democ'
+democ_factor_2016 <- factor(democ_factor_2016, levels=c(
+"not democ", "weak democ", "mid democ", "high democ" ))
+table(democ_2016, democ_factor_2016, useNA='always')
+
+attributes(democ_factor_2016)$'levels' <- c('ambiguous democ','mid democ','high democ')
+
+
+democ_factor_2016[which(democ_factor_2016=='not democ' & democ_factor_2016=='weak democ')] = 'not democ, ambiguous' 
+
+
+```
