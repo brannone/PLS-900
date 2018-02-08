@@ -28,4 +28,11 @@ attributes(democ_factor_2016)$'levels' <- c('ambiguous democ','mid democ','high 
 democ_factor_2016[which(democ_factor_2016=='not democ' & democ_factor_2016=='weak democ')] = 'not democ, ambiguous' 
 
 
+#Start here
+levels(democ_factor_2016) <- c("not democ", "ambiguous", "ambiguous", "high democ")
+
+levels(democ_factor_2016)
+
+democ_factor_2016
+#end here, literally just merges them into a single level.
 ```
