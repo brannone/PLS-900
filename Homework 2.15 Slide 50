@@ -1,0 +1,58 @@
+---
+title: "Homework 2.15 Slide 50"
+author: "Elizabeth Brannon, Kesicia Dickinson, and Shane Wery"
+date: "2/14/2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r merge}
+worldBank <- read.csv(
+file='/Users/elizabethbrannon/Dropbox/PLS 900/worldBank.csv',
+stringsAsFactors=FALSE
+)
+
+
+head(worldBank)
+
+colnames(worldBank)[4:7] = c( #rename column names; subsets columns 4-7 and renames them in order
+'gdpGrowth', 'gdppcConstant',
+'popGrowth', 'tradeOpen'
+)
+
+
+library(countrycode)
+polity$cname <- countrycode(
+sourcevar=polity$country,
+origin='country.name', destination='country.name') #tells it the format currently and what to put it in
+worldBank$cname <- countrycode(
+worldBank$country,
+'country.name', 'country.name')
+
+head(unique(polity[,c('country','cname')])) #unique works to pull out only one observation per country 
+
+polity$cyear <- paste( #this considers the time series structure
+polity$cname, polity$year,
+sep='_' #this puts cname and year together
+)
+worldBank$cyear <- paste(
+worldBank$cname, worldBank$year, #same for WB
+sep='_'
+)
+
+polity$gdpGrowth <- worldBank$gdpGrowth[ #tells it to shuffle order of WB data gdp growth to match that of polity gdp growth 
+match(
+polity$cyear,
+worldBank$cyear
+)
+] 
+
+matched <- head(match(polity$cyear, worldBank$cyear))
+polity$cyear[1:6]
+
+worldBank[matched,'cyear']
+
+head(polity) #then using a forloop, merge four other WB data into polity using a forloop
