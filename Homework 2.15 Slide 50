@@ -56,3 +56,23 @@ polity$cyear[1:6]
 worldBank[matched,'cyear']
 
 head(polity) #then using a forloop, merge four other WB data into polity using a forloop
+```
+
+```{r add variables}
+
+```{r Adding Variables}
+#Create a vector of the variables we are adding
+add.variables <- c(worldBank$gdppcConstant, worldBank$popGrowth, worldBank$tradeOpen)
+
+
+#Create a loop to create new variables matched on cyear
+for(i in 1:length(add.variables)){
+  polity$add.variables[i] <- add.variables[i] [ 
+  match(
+    polity$cyear,
+    worldBank$cyear
+  )
+  ]
+}
+#Returning mismatched vector lengths by 1 
+```
