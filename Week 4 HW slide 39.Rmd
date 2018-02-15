@@ -1,6 +1,6 @@
 ---
-title: "Untitled"
-author: "Shane, Lizzie, Kesicia"
+title: "Week 4 HW Slide 39"
+author: "Shane Weary, Elizabeth Brannon, Kesicia Dickinson"
 date: "February 14, 2018"
 output: pdf_document
 ---
@@ -11,7 +11,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r create rows}
 # step 1: set digits *does not give expected result, why?*
-
 options(digits = 2)
 
 # step 2: create rows
