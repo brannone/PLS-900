@@ -10,11 +10,11 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r create rows}
-#set digits *does not give expected result, why?*
+# step 1: set digits *does not give expected result, why?*
 
 options(digits = 2)
 
-#create rows
+# step 2: create rows
 n.row <- c(length(polity$democ[!is.na(polity$democ)]),
            length(polity$autoc[!is.na(polity$autoc)]),
            length(polity$polity2[!is.na(polity$polity2)]),
@@ -56,8 +56,7 @@ sd.row <- c(sd(na.omit(polity$democ)),
             sd(na.omit(polity$xconst))
 )
 
-#combine rows into a matrix
-
+# step 3: combine rows into a matrix
 summary.matrix <- matrix(c(n.row, 
                            na.row, 
                            mean.row, 
@@ -70,8 +69,7 @@ summary.matrix <- matrix(c(n.row,
                          byrow=TRUE
 )
 
-#Name the rows
-
+# step 4: name the rows
 row.names(summary.matrix) <- c("N", 
                                "NA", 
                                "Mean", 
