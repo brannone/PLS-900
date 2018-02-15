@@ -196,16 +196,16 @@ The residual degrees of freedom is 30. The R^2 is 0.7528.
 ```{r exercise 7.1}
 mtcars
 
-set.seed(10) #set seed for reproducibility
+set.seed(10) # here, we are setting seed for reproducibility
 
-mtcars[,sample(ncol(mtcars))] #the comma goes first because we want to reorder the columns
+mtcars[,sample(ncol(mtcars))] # since we want to reorder the columns the comma goes first 
 
-mtcars[sample(nrow(mtcars)),sample(ncol(mtcars))] #by adding in the row argument before the columns one, we can randomly order both rows and columns in one step. 
+mtcars[sample(nrow(mtcars)),sample(ncol(mtcars))] # adding the row argument before the columns allows us to randomly order the rows and the columns in one step
 ```
 
 ## 2. How would you select a random sample of m rows from a data frame? What if the sample had to be contiguous (i.e., with an initial row, a final row, and every row in between)?
 ```{r exercise 7.2}
-mtcars[sample(nrow(mtcars),5),] #this would randomly sample 5 rows from the dataframe. 
+mtcars[sample(nrow(mtcars),5),] # this randomly samples 5 rows from the dataframe
 
 mtcars[sample(nrow(mtcars), 1:7),]
 ```
@@ -213,7 +213,7 @@ mtcars[sample(nrow(mtcars), 1:7),]
 ## 3. How could you put the columns in a data frame in alphabetical order?
 
 ```{r exercise 7.3}
-mtcars[,order(names(mtcars))] #again, we need the comma first to signify that we are looking at the columns, not rows. Then we use order and names to list alphabetically. 
+mtcars[,order(names(mtcars))]# we place the comma first as we did in the exercise above since we are looking at the columns and we use order and names to list alphabetically
 
 ```
 
