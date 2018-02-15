@@ -9,20 +9,19 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-##Vectors
-#1. What are the six types of atomic vector? How does a list differ from an atomic vector?
+### Vectors
+## 1. What are the six types of atomic vector? How does a list differ from an atomic vector?
 The six types of atomic vectors are logical, integer, double, character, complex, and raw. Lists are different from atomic vectors because their elements can be of any type, whereas for atomic vectors the type must be the same. For example, if there is a character and some numbers in an atomical vector, the vector will be coerced into a character vector. This does not happen with lists. 
 
-#2. What makes is.vector() and is.numeric() fundamentally different to is.list() and is.character()?
+## 2. What makes is.vector() and is.numeric() fundamentally different to is.list() and is.character()?
 is.vector() and is.numeric() will not test whether the object is a vector or if it is a number. is.vector() will tell you TRUE or FALSE depending on if the object is a vector and has no other characteristics besides their names. Similarly, is.numeric() tells you the "numberliness" according to Wickam, but does not tell you if the vector is a nueric. is.list() and is.character() are different from these two cases because they are actually telling you the type of vector. 
 
+## 3. Test your knowledge of vector coercion rules by predicting the output of the following uses of c():
 
-#3. Test your knowledge of vector coercion rules by predicting the output of the following uses of c():
-
-c(1, FALSE): This will give us a numeric vector, because when TRUE or FALSE are combined with an integer, they are coerced into a number. TRUE or FALSE is read as 1 or 0. 
-c("a", 1): This will give us a character vector because when a character is read with a number, the number is forced into a character as well. 
-c(list(1), "a"): This is combining a list with a character vector and therefore each will be treated as its own list. The first list will remain an integer and the second list will remain a character.
-c(TRUE, 1L): This will create an integer vector, both because the presence of an integer will coerce TRUE into an integer and because L creates an integer rather than a double vector. 
+# c(1, FALSE): This will give us a numeric vector, because when TRUE or FALSE are combined with an integer, they are coerced into a number. TRUE or FALSE is read as 1 or 0. 
+# c("a", 1): This will give us a character vector because when a character is read with a number, the number is forced into a character as well. 
+# c(list(1), "a"): This is combining a list with a character vector and therefore each will be treated as its own list. The first list will remain an integer and the second list will remain a character.
+# c(TRUE, 1L): This will create an integer vector, both because the presence of an integer will coerce TRUE into an integer and because L creates an integer rather than a double vector. 
 
 ```{r exercise 1.3}
 #check the predictions. 
@@ -33,57 +32,45 @@ c(TRUE, 1L)
 
 ```
 
-#4. Why do you need to use unlist() to convert a list to an atomic vector? Why doesn’t as.vector() work?
-
+## 4. Why do you need to use unlist() to convert a list to an atomic vector? Why doesn’t as.vector() work?
 You cannot use as.vector() to convert a list to an atomic vector because lists can contain nested lists, making them, according to Wickham, fundamentally different than vectors. 
 
-#5. Why is 1 == "1" true? Why is -1 < FALSE true? Why is "one" < 2 false?
-
+## 5. Why is 1 == "1" true? Why is -1 < FALSE true? Why is "one" < 2 false?
 This is because of the rules of coercion. In the first case, 1=="1", because there is a one character value, both values will be converted to a character value, making it "1" == "1". In the second case, because there is a numeric value, FALSE will be converted into a number, making it -1 > 0. In the last case, "one" < 2, the 2 will be converted into a character value "2". These character values cannot be compared in this way, because they perceived as nominal variables. 
 
-#6. Why is the default missing value, NA, a logical vector? What’s special about logical vectors? (Hint: think about c(FALSE, NA_character_).)
-
+## 6. Why is the default missing value, NA, a logical vector? What’s special about logical vectors? (Hint: think about c(FALSE, NA_character_).)
 Logical vectors are the most flexible among the vectors when it comes to coecion and this is likely why the default for NA would be a logical vector. Otherwised, when paired with values to be coerced, the NA could force another value to be converted. With NAs being logical values, you can ensure that you do not lose the true attributes of the actual values you have included and instead the NAs will be coerced into that value type. 
 
-##Attributes
-
-#1. An early draft used this code to illustrate structure():
-
+### Attributes
+## 1. An early draft used this code to illustrate structure():
 ```{r exercise 2.1}
 structure(1:5, comment = "my attribute")
 ?comment
 ```
+# But when you print that object you don’t see the comment attribute. Why? Is the attribute missing, or is there something else special about it? (Hint: try using help.)
+In this case, the comment is a special tag which gives the attribute to the object, but does not print it.
 
-But when you print that object you don’t see the comment attribute. Why? Is the attribute missing, or is there something else special about it? (Hint: try using help.)
-
-The comment is not printed in this case becuase comment is a special tag that gives the attribute to the object, but does not print it. 
-
-#2. What happens to a factor when you modify its levels?
-
+## 2. What happens to a factor when you modify its levels?
 ```{r exercise 2.2}
 f1 <- factor(letters)
 f1
 levels(f1) <- rev(levels(f1))
 f1
 ```
-When you reverse the levels of the object, it also reverses the actual vector. From here, we can assume that if you alter the levels, you are also altering the vector content. 
+Reversing the levels of the object also reverses the actual vector. Thus, we can assume that altering the levels also alters the vector content. 
 
-#3. What does this code do? How do f2 and f3 differ from f1?
-
+## 3. What does this code do? How do f2 and f3 differ from f1?
 ```{r exercise 2.3}
 f2 <- rev(factor(letters))
 f2
 f3 <- factor(letters, levels = rev(letters))
 f3
 ```
-
 f2 is only reversing the actual content of the vector, whereas f3 is specifing the content of the vector and then reversing the levels. Both of these are different from what we did in f1 because they are specifically identifying whether it is the factors or the levels that are being reversed. In f1, the command was levels(f1) <- rev(levels(f1)). Since the actual vector f1 is embedded within the reverse command here, it reversed both the factors and the levels. 
 
-##Matrices and Arrays
-
-#1. What does dim() return when applied to a vector?
-When applied to a vector, dim() would return null because vectors are not multidimensional. Using the dim() <- however would allow the vector to become or behave as if it is a multidimensional object. 
-
+### Matrices and Arrays
+## 1. What does dim() return when applied to a vector?
+Since vectors are not multidimensional, dim() returns null; however, using dim() allows the vector to behave as if it is a multidimensional object.
 ```{r exercise 3.1}
 #example
 c <- c(1,2,3,4)
@@ -94,10 +81,10 @@ dim(b) <- c(2,2) #here, it turns the vector into a matrix.
 b 
 ```
 
-#2. If is.matrix(x) is TRUE, what will is.array(x) return?
-It would return TRUE because a matrix is a type of array.
+## 2. If is.matrix(x) is TRUE, what will is.array(x) return?
+In this case, is.array(x) will return TRUE because a matrix is a type of array.
 
-#3. How would you describe the following three objects? What makes them different to 1:5?
+# 3. How would you describe the following three objects? What makes them different to 1:5?
 ```{r exercise 3.3}
 x1 <- array(1:5, c(1, 1, 5))
 x1
@@ -110,30 +97,27 @@ x4
 ```
 x1, x2, and x3 are 3D arrays. In x1, you have 5 1x1 arrays, In x2, you have 1 1x5 array. In x3, you have 1 5x1 array. This is different than just creating an object that is 1:5 because they have three dimensions. You can see the difference in the structure by looking at x4. 
 
-#Data Frames
+### Data Frames
+## 1. What attributes does a data frame possess?
+A dataframe has: 
+- names ( colnames() and rownames() )
+- length ( ncol() and nrow() )
+- class
 
-#1. What attributes does a data frame possess?
+## 2. What does as.matrix() do when applied to a data frame with columns of different types?
+When applied to a dataframe with columns of different types, as.matrix() coercises into a matrix with the same number of rows and columns. 
 
-A data frame contains similar properties to both matrices and lists. It has names, (colnames() and rownames()) and length (ncol() and nrow()). It also has class. 
-
-#2. What does as.matrix() do when applied to a data frame with columns of different types?
-
-It coercises it into a matrix with the same number of columns and rows as the matrix. 
-
-#3. Can you have a data frame with 0 rows? What about 0 columns?
-
+## 3. Can you have a data frame with 0 rows? What about 0 columns?
 ```{r exercise 4.3}
 
 df <- data.frame(0,0)
 str(df)
 ```
-Yes, you can have an empty data frame. 
+Yes. A dataframe with 0 rows and/or 0 columns is an empty dataframe.
 
-###Subsetting
-
-##Data Types
-
-#1. Fix each of the following common data frame subsetting errors:
+### Subsetting
+### Data Types
+## 1. Fix each of the following common data frame subsetting errors:
 ```{r exercises 5.1 errors}
 mtcars[mtcars$cyl = 4, ]
 mtcars[-1:4, ]
@@ -149,7 +133,7 @@ mtcars[mtcars$cyl == 4 | mtcars$cyl == 6, ]
 ```
 In the first equation, it needed to be "==" not "=" to use a logical equation. In the second problem, the negative must go outside the parenthesis, otherwise it will think it is looking for a negative number. The comma also must go outside the parenthesis to keep the column structure. For the same reason, a comma is added to the third problem. Finally, for the last problem, after | another "mtcars$cyl ==" must be added to complete the logical statement. 
 
-#2. Why does x <- 1:5; x[NA] yield five missing values? (Hint: why is it different from x[NA_real_]?)
+## 2. Why does x <- 1:5; x[NA] yield five missing values? (Hint: why is it different from x[NA_real_]?)
 ```{r exercise 5.2}
 x <- 1:5
 x[NA]
@@ -157,8 +141,7 @@ x[NA_real_]
 ```
 NA is a logical vector with a length of 1 and so when using it to index, it will always give NA. It will continue to work through for values 1 to 5, resulting in NA each time.  
 
-#3. What does upper.tri() return? How does subsetting a matrix with it work? Do we need any additional subsetting rules to describe its behaviour?
-
+## 3. What does upper.tri() return? How does subsetting a matrix with it work? Do we need any additional subsetting rules to describe its behaviour?
 ```{r exercise 5.3}
 x <- outer(1:5, 1:5, FUN = "*")
 x
@@ -167,16 +150,14 @@ x[upper.tri(x)]
 The upper.tri() will return the upper right triangle of the matrix. To understand how the matrix is subset, we also need to know that when a matrix is subset, it will be treated as if a vector and therefore gives the results in a single vector form. 
 
 
-#4. Why does mtcars[1:20] return an error? How does it differ from the similar mtcars[1:20, ]?
-
+## 4. Why does mtcars[1:20] return an error? How does it differ from the similar mtcars[1:20, ]?
 ```{r exercise 5.4}
 mtcars[1:20]
 mtcars[1:20, ]
 ```
 mtcars[] will give an error because it lacks the comma from the second commnad: mtcars[1:20, ]. The comma is necessary because it tells r to maintain the existing column structure. Without the comma, r does not know what number of columns to include. 
 
-#5. Implement your own function that extracts the diagonal entries from a matrix (it should behave like diag(x) where x is a matrix).
-
+## 5. Implement your own function that extracts the diagonal entries from a matrix (it should behave like diag(x) where x is a matrix).
 ```{r exercise 5.5}
 x <- outer(1:5, 1:5, FUN = "*")
 x
@@ -193,31 +174,25 @@ diagfunc <- function(x) {
 diagfunc 
 ```
 
-#6. What does df[is.na(df)] <- 0 do? How does it work?
-
+## 6. What does df[is.na(df)] <- 0 do? How does it work?
 ```{r exercise 5.6}
 df[is.na(df)] <- 0
 
 ```
+It is telling R to use the object df and subset all of the values in df that are NAs. Then, its giving R the command to replace each of these instances with a zero. Thus, it replaces all NAs in df with zero. 
 
-This subsetting problem is telling r to first use the object df and subsett all of the values in df that are NAs. Then, it is telling r to replace all of these instances with a zero. Simply, it replaces all the NAs in df with a zero. 
-
-##Subsetting Operators
-
-#1. Given a linear model, e.g., mod <- lm(mpg ~ wt, data = mtcars), extract the residual degrees of freedom. Extract the R squared from the model summary (summary(mod))
-
+### Subsetting Operators
+## 1. Given a linear model, e.g., mod <- lm(mpg ~ wt, data = mtcars), extract the residual degrees of freedom. Extract the R squared from the model summary (summary(mod))
 ```{r exercise 6.1}
 mod <- lm(mpg ~ wt, data = mtcars)
 
 mod$df.residual
 (summary(mod))
 ```
-The residual degrees of freedom is 30 and the R squared is 0.7528.
+The residual degrees of freedom is 30. The R^2 is 0.7528.
 
-##Subsetting and Assignment
-
-#1. How would you randomly permute the columns of a data frame? (This is an important technique in random forests.) Can you simultaneously permute the rows and columns in one step?
-
+### Subsetting and Assignment
+## 1. How would you randomly permute the columns of a data frame? (This is an important technique in random forests.) Can you simultaneously permute the rows and columns in one step?
 ```{r exercise 7.1}
 mtcars
 
@@ -228,14 +203,14 @@ mtcars[,sample(ncol(mtcars))] #the comma goes first because we want to reorder t
 mtcars[sample(nrow(mtcars)),sample(ncol(mtcars))] #by adding in the row argument before the columns one, we can randomly order both rows and columns in one step. 
 ```
 
-#2. How would you select a random sample of m rows from a data frame? What if the sample had to be contiguous (i.e., with an initial row, a final row, and every row in between)?
+## 2. How would you select a random sample of m rows from a data frame? What if the sample had to be contiguous (i.e., with an initial row, a final row, and every row in between)?
 ```{r exercise 7.2}
 mtcars[sample(nrow(mtcars),5),] #this would randomly sample 5 rows from the dataframe. 
 
 mtcars[sample(nrow(mtcars), 1:7),]
 ```
 
-#3. How could you put the columns in a data frame in alphabetical order?
+## 3. How could you put the columns in a data frame in alphabetical order?
 
 ```{r exercise 7.3}
 mtcars[,order(names(mtcars))] #again, we need the comma first to signify that we are looking at the columns, not rows. Then we use order and names to list alphabetically. 
