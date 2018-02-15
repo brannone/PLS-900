@@ -18,10 +18,10 @@ is.vector() and is.numeric() will not test whether the object is a vector or if 
 
 ## 3. Test your knowledge of vector coercion rules by predicting the output of the following uses of c():
 
-# c(1, FALSE): This will give us a numeric vector, because when TRUE or FALSE are combined with an integer, they are coerced into a number. TRUE or FALSE is read as 1 or 0. 
-# c("a", 1): This will give us a character vector because when a character is read with a number, the number is forced into a character as well. 
-# c(list(1), "a"): This is combining a list with a character vector and therefore each will be treated as its own list. The first list will remain an integer and the second list will remain a character.
-# c(TRUE, 1L): This will create an integer vector, both because the presence of an integer will coerce TRUE into an integer and because L creates an integer rather than a double vector. 
+## c(1, FALSE): This will give us a numeric vector, because when TRUE or FALSE are combined with an integer, they are coerced into a number. TRUE or FALSE is read as 1 or 0. 
+## c("a", 1): This will give us a character vector because when a character is read with a number, the number is forced into a character as well. 
+## c(list(1), "a"): This is combining a list with a character vector and therefore each will be treated as its own list. The first list will remain an integer and the second list will remain a character.
+## c(TRUE, 1L): This will create an integer vector, both because the presence of an integer will coerce TRUE into an integer and because L creates an integer rather than a double vector. 
 
 ```{r exercise 1.3}
 #check the predictions. 
@@ -47,7 +47,7 @@ Logical vectors are the most flexible among the vectors when it comes to coecion
 structure(1:5, comment = "my attribute")
 ?comment
 ```
-# But when you print that object you don’t see the comment attribute. Why? Is the attribute missing, or is there something else special about it? (Hint: try using help.)
+## But when you print that object you don’t see the comment attribute. Why? Is the attribute missing, or is there something else special about it? (Hint: try using help.)
 In this case, the comment is a special tag which gives the attribute to the object, but does not print it.
 
 ## 2. What happens to a factor when you modify its levels?
@@ -84,7 +84,7 @@ b
 ## 2. If is.matrix(x) is TRUE, what will is.array(x) return?
 In this case, is.array(x) will return TRUE because a matrix is a type of array.
 
-# 3. How would you describe the following three objects? What makes them different to 1:5?
+## 3. How would you describe the following three objects? What makes them different to 1:5?
 ```{r exercise 3.3}
 x1 <- array(1:5, c(1, 1, 5))
 x1
