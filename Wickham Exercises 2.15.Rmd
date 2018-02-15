@@ -215,5 +215,5 @@ mtcars[sample(nrow(mtcars), 1:7),]
 ```{r exercise 7.3}
 mtcars[,order(names(mtcars))]# we place the comma first as we did in the exercise above since we are looking at the columns and we use order and names to list alphabetically
 
-```
+``` 
 
