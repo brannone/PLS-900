@@ -85,7 +85,7 @@ colnames(summary.matrix) <- c("democ",
                               "polity2", 
                               "xconst"
                               )
-#show off 
+
 summary.matrix
 
 ```
