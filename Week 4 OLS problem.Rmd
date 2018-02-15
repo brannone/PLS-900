@@ -1,6 +1,6 @@
 ---
 title: "Example slide 25"
-author: "Shane, Lizzie, Kesicia"
+author: "Shane Weary, Elizabeth Brannon, Kesicia Dickinson"
 date: "February 14, 2018"
 output: pdf_document
 ---
