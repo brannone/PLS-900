@@ -59,20 +59,20 @@ head(polity) #then using a forloop, merge four other WB data into polity using a
 ```
 
 ```{r add variables}
+#Clean out the nasty cyears that are duplicated
+clean.wb <- data.frame(subset(worldBank, !is.na(cname)))
 
-```{r Adding Variables}
-#Create a vector of the variables we are adding
-add.variables <- c(worldBank$gdppcConstant, worldBank$popGrowth, worldBank$tradeOpen)
+add.variables <- c("gdppcConstant", "popGrowth", "tradeOpen")
 
 
 #Create a loop to create new variables matched on cyear
-for(i in 1:length(add.variables)){
-  polity$add.variables[i] <- add.variables[i] [ 
+for(i in add.variables){
+  polity[,i] <- clean.wb[,i] [ 
   match(
     polity$cyear,
-    worldBank$cyear
+    clean.wb$cyear
   )
   ]
 }
-#Returning mismatched vector lengths by 1 
+head(polity)
 ```
