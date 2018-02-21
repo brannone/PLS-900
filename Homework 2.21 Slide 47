@@ -1,0 +1,49 @@
+---
+title: "Homework 2.21 Slide 47"
+author: "Elizabeth Brannon, Kesicia Dickinson, and Shane Wery"
+date: "2/21/2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r in class exercise 4}
+setwd("/Users/elizabethbrannon/Dropbox/")
+load("/Users/elizabethbrannon/Dropbox/PLS 900/polity_dataframe.rda")
+
+fnx = function(x){
+  numberNA = sum(is.na(x))
+  x=x[!is.na(x)]
+  n=length(x)
+  c(n=n, numberNA=numberNA, mean=mean(x), median=median(x), max=max(x), min=min(x), stdev=sd(x))
+}
+
+
+looptest <- function(polity){
+for(i in 1:ncol(polity)){
+polity[,i] <- fnx(polity[,i]) } }
+
+applytest <- function(polity){
+polity[] <- apply(polity[c("democ", "autoc", "polity2", "xconst")], 2, fnx)
+return(polity) }
+
+sapplytest <- function(polity){
+polity[] <- sapply(polity[c("democ", "autoc", "polity2", "xconst")], fnx)
+return(polity) }
+
+lapplytest <- function(polity){
+polity[] <- lapply(polity, fnx)
+return(polity) }
+
+library(rbenchmark)
+benchmark(
+  looptest(polity),
+  applytest(polity),
+  sapplytest(polity),
+  lapplytest(polity),
+  replications=5,
+  columns=c('test','elapsed','replications')
+  )
+``` 
