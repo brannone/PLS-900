@@ -64,7 +64,7 @@ loop.test <- function(variable){
   
   return(loopdata)
 }
-#create a vector for the 'i' values
+#create a vector for the 'i' values in the loop
 variables <- c('democ','autoc','polity2','xconst')
 
 
@@ -80,6 +80,8 @@ benchmark(replications =10,
 ```
 
 ```{r tapply and dplyer}
+
+#create an object for the new dataframe by using tapply to apply each function to the desired variables
 tapply.test <- cbind(tapply(polity$polity2, polity$year, mean, na.rm=T),
                tapply(polity$xconst, polity$year, mean, na.rm=T),
                tapply(polity$polity2, polity$year, median, na.rm=T),
@@ -87,7 +89,7 @@ tapply.test <- cbind(tapply(polity$polity2, polity$year, mean, na.rm=T),
                tapply(polity$polity2, polity$year, sd, na.rm=T),
                tapply(polity$xconst, polity$year, sd, na.rm=T)
 )
-
+#add column names
 colnames(tapply.test) <- c('democ_mean','xconst_mean',
                            'democ_median','xconst_median',
                            'democ_sd', 'xconst_sd')
@@ -95,6 +97,7 @@ tapply.test
 
 library(dplyr)
 
+#use dplyr summarise command to do the work of tapply. dplyr allows us to group by year prior to the summarise command.
 polity %>%
   group_by(year)%>%
   summarise(democ_mean = mean(polity2, na.rm=T),
