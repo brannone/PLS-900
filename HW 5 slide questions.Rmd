@@ -1,0 +1,107 @@
+---
+title: "Slides 47 and 50"
+author: "Lizzie Brannon, Kesicia Dickinson, Shane Wery"
+date: "February 21, 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r exercise four}
+#Using polity data
+
+#create a function that can return the values we are looking for
+
+sum.fun = function(x){
+  numberNA = sum(is.na(x))
+  x=x[!is.na(x)]
+  n=length(x)
+  return(c(n=n, 
+           numberNA=numberNA, 
+           mean=mean(x), 
+           median=median(x), 
+           max=max(x), 
+           min=min(x), 
+           stdev=sd(x)))
+}
+
+
+
+#Create functions for each test
+
+lapply.test <- function(data){
+  lapplydata <- do.call(cbind, lapply(data, sum.fun))
+  row.names(lapplydata) <- (c('n','NA', 'mean', 'median', 'max', 'min', 'sd'))
+  return(lapplydata)
+}
+
+sapply.test <- function(data){
+  sapplydata <- sapply(data, sum.fun)
+  row.names(sapplydata) <- (c('n','NA', 'mean', 'median', 'max', 'min', 'sd'))
+  return(sapplydata)
+}
+
+apply.test <- function(data){
+  applydata <- apply(data, 2, sum.fun)
+  row.names(applydata) <- (c('n','NA', 'mean', 'median', 'max', 'min', 'sd'))
+  return(applydata)
+}
+
+loop.test <- function(variable){
+  
+  loopdata <- data.frame('democ'= rep(NA, 7), 'autoc' = rep(NA), 'polity2' = rep(NA), 'xconst' =
+                           rep(NA))
+  for (i in variable){
+    loopdata[,i] <- sum.fun(polity[,i])
+  }
+  
+  row.names(loopdata) <- c("n","NA", "mean","median","max","min","sd")
+  
+  return(loopdata)
+}
+#create a vector for the 'i' values in the loop
+variables <- c('democ','autoc','polity2','xconst')
+
+
+#run benchmark
+library(rbenchmark)
+
+benchmark(replications =10, 
+          lapply.test(polity[,c('democ','autoc','polity2','xconst')]),
+          sapply.test(polity[,c('democ','autoc','polity2','xconst')]),
+          apply.test(polity[,c('democ','autoc','polity2','xconst')]),
+          loop.test(variables)
+)
+```
+
+```{r tapply and dplyer}
+
+#create an object for the new dataframe by using tapply to apply each function to the desired variables
+tapply.test <- cbind(tapply(polity$polity2, polity$year, mean, na.rm=T),
+               tapply(polity$xconst, polity$year, mean, na.rm=T),
+               tapply(polity$polity2, polity$year, median, na.rm=T),
+               tapply(polity$xconst, polity$year, median, na.rm=T),
+               tapply(polity$polity2, polity$year, sd, na.rm=T),
+               tapply(polity$xconst, polity$year, sd, na.rm=T)
+)
+#add column names
+colnames(tapply.test) <- c('democ_mean','xconst_mean',
+                           'democ_median','xconst_median',
+                           'democ_sd', 'xconst_sd')
+tapply.test
+
+library(dplyr)
+
+#use dplyr summarise command to do the work of tapply. dplyr allows us to group by year prior to the summarise command.
+polity %>%
+  group_by(year)%>%
+  summarise(democ_mean = mean(polity2, na.rm=T),
+            xconst_mean = mean(xconst, na.rm=T),
+            democ_median = median(polity2, na.rm=T),
+            xconst_median = median(xconst, na.rm=T),
+            democ_sd = sd(polity2, na.rm=T),
+            xconst_sd = sd(xconst, na.rm=T)
+  )
+```
