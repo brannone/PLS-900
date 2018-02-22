@@ -13,37 +13,68 @@ knitr::opts_chunk$set(echo = TRUE)
 setwd("/Users/elizabethbrannon/Dropbox/")
 load("/Users/elizabethbrannon/Dropbox/PLS 900/polity_dataframe.rda")
 
-fnx = function(x){
+#Using polity data
+
+#create a function that can return the values we are looking for
+
+sum.fun = function(x){
   numberNA = sum(is.na(x))
   x=x[!is.na(x)]
   n=length(x)
-  c(n=n, numberNA=numberNA, mean=mean(x), median=median(x), max=max(x), min=min(x), stdev=sd(x))
+  return(c(n=n, 
+           numberNA=numberNA, 
+           mean=mean(x), 
+           median=median(x), 
+           max=max(x), 
+           min=min(x), 
+           stdev=sd(x)))
 }
 
 
-looptest <- function(polity){
-for(i in 1:ncol(polity)){
-polity[,i] <- fnx(polity[,i]) } }
 
-applytest <- function(polity){
-polity[] <- apply(polity[c("democ", "autoc", "polity2", "xconst")], 2, fnx)
-return(polity) }
+#Create functions for each test
 
-sapplytest <- function(polity){
-polity[] <- sapply(polity[c("democ", "autoc", "polity2", "xconst")], fnx)
-return(polity) }
+lapply.test <- function(data){
+  lapplydata <- do.call(cbind, lapply(data, sum.fun))
+  row.names(lapplydata) <- (c('n','NA', 'mean', 'median', 'max', 'min', 'sd'))
+  return(lapplydata)
+}
 
-lapplytest <- function(polity){
-polity[] <- lapply(polity, fnx)
-return(polity) }
+sapply.test <- function(data){
+  sapplydata <- sapply(data, sum.fun)
+  row.names(sapplydata) <- (c('n','NA', 'mean', 'median', 'max', 'min', 'sd'))
+  return(sapplydata)
+}
 
+apply.test <- function(data){
+  applydata <- apply(data, 2, sum.fun)
+  row.names(applydata) <- (c('n','NA', 'mean', 'median', 'max', 'min', 'sd'))
+  return(applydata)
+}
+
+loop.test <- function(variable){
+  
+  loopdata <- data.frame('democ'= rep(NA, 7), 'autoc' = rep(NA), 'polity2' = rep(NA), 'xconst' =
+                           rep(NA))
+  for (i in variable){
+    loopdata[,i] <- sum.fun(polity[,i])
+  }
+  
+  row.names(loopdata) <- c("n","NA", "mean","median","max","min","sd")
+  
+  return(loopdata)
+}
+#create a vector for the 'i' values
+variables <- c('democ','autoc','polity2','xconst')
+
+
+#run benchmark
 library(rbenchmark)
-benchmark(
-  looptest(polity),
-  applytest(polity),
-  sapplytest(polity),
-  lapplytest(polity),
-  replications=5,
-  columns=c('test','elapsed','replications')
-  )
-``` 
+
+benchmark(replications =10, 
+          lapply.test(polity[,c('democ','autoc','polity2','xconst')]),
+          sapply.test(polity[,c('democ','autoc','polity2','xconst')]),
+          apply.test(polity[,c('democ','autoc','polity2','xconst')]),
+          loop.test(variables)
+)
+   
