@@ -1,0 +1,399 @@
+---
+title: "PLS 900 HW 3/22"
+author: "Shane Wery, Lizzie Brannon, & Kesicia Dickinson"
+date: "March 22, 2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r data, echo=FALSE, warning=FALSE}
+library(readr)
+library(dplyr)
+library(ggplot2)
+approval_data <- read_csv("C:/Users/swery/Downloads/approval_polllist.csv")
+
+
+#q1 Data
+
+library(readxl)
+Climate_Attitude <- read_excel("C:/Users/swery/Desktop/PLS 900/Graph Assignment Data/Climate Attitude.xlsx")
+Iran_Attitude <- read_excel("C:/Users/swery/Desktop/PLS 900/Graph Assignment Data/Iran Policy Attitude.xlsx")
+Immigration_Attitude <- read_excel("C:/Users/swery/Desktop/PLS 900/Graph Assignment Data/Muslim Ban Attitude.xlsx")
+Trade_Attitude <- read_excel("C:/Users/swery/Desktop/PLS 900/Graph Assignment Data/Trade Policy Attitude.xlsx")
+Wall_Attitude <- read_excel("C:/Users/swery/Desktop/PLS 900/Graph Assignment Data/Wall Attitude.xlsx")
+
+#question 3 data
+
+library(haven)
+Dyad.Data <- read_dta("C:/Users/swery/Desktop/PLS 900/Dyadicdata.dta")
+
+EPR <- read_dta("C:/Users/swery/Desktop/PLS 900/EPR3CountryNewReduced.dta")
+
+polity <- read.csv("C:/Users/swery/Desktop/PLS 900/polity.csv", stringsAsFactors = FALSE)
+
+
+LJI.Data <- read.csv("C:/Users/swery/Desktop/PLS 900/LJI-estimates-20140422.csv", stringsAsFactors = FALSE)
+
+```
+***Question 1
+
+```{r first gaph, echo=FALSE, warning=FALSE}
+#create a vector of region identifiers
+#could have been done by merging the countrycode dataset, but this is easier
+
+# North America 0, Asia 1, SAM2 , MEA 3, EaR 4
+
+Region_vector <- as.vector(c('North America',
+                             rep('Europe & Russia', 11), 
+                             rep('Asia', 7), 
+                             rep('Middle East & Africa', 11),
+                             rep('South America & Mexico', 7)))
+
+
+
+Figure1_Data <- rbind(Climate_Attitude[1:37,],
+                      Immigration_Attitude[1:37,],
+                      Iran_Attitude[1:37,],
+                      Trade_Attitude[1:37,],
+                      Wall_Attitude[1:37,])
+
+plot_ident <- as.vector(c(rep(1,37),
+                          rep(5 ,37),
+                          rep(3,37),
+                          rep(4,37),
+                          rep(2,37)))
+
+
+Figure1_Data <- cbind(Figure1_Data,
+                      rep(Region_vector, 5),
+                      plot_ident
+                      )
+
+
+colnames(Figure1_Data) <- c('country',
+                            'net_approve',
+                            'Approve', 
+                            'Disapprove', 
+                            'DK/Refused', 
+                            'Region',
+                            'plot')
+#make plot a factor so we can give them names
+
+Figure1_Data$plot <- as.factor(Figure1_Data$plot)
+Figure1_Data$Region <- as.factor(Figure1_Data$Region)
+
+#Drop Canada and Australia since we don't need it
+
+Figure1_Data <- Figure1_Data[-c(1,38,75,112,149,13,50,87,124,161),]
+levels(Figure1_Data$plot) <- c('Withdraw from global climate change agreements',
+                               'Build a wall between the US and Mexico',
+                               'Withdraw from the Iran nuclear weapons agreement',
+                               'Withdraw from major trade agreements',
+                               'Restrict travel from some majority-Muslim                                            countries')
+
+#create data for the vertical lines
+
+Figure1_Data <- Figure1_Data %>%
+  group_by(plot) %>%
+  mutate(
+   mean_line = mean(net_approve)
+  )
+
+#Create a wrapped label for facets
+library(stringr)
+Figure1_Data$plot = str_wrap(Figure1_Data$plot, width=15)
+
+ggplot(Figure1_Data, aes(x = Figure1_Data$net_approve)) +
+  geom_point(aes(y=Figure1_Data$Region, color=Region)) +
+  geom_vline(aes(xintercept=Figure1_Data$mean_line), linetype='dotted') +
+  facet_wrap(~Figure1_Data$plot, nrow = 1) +
+  geom_vline(aes(xintercept = 0)) +
+  xlab("") +
+  ylab("") +
+  scale_fill_manual(values = c('NA'= 'black',
+                                'EaR' = 'cyan',
+                                'MEA' = 'fuscia',
+                                'SAM' = 'green',
+                                'Asia' = 'orange'))+
+   geom_text(aes(x= 30, y=.65,label= 'More \n Approve ->'), color='black', alpha=.04, size=1.5) +
+  geom_text(aes(x= -30, y=.65,label= '<-Less \n Approve'), color='black', alpha=.04, size=1.5) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), 
+        axis.text.x = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = 'none',
+        strip.text.x = element_text(size= 6),
+        strip.background =element_rect(fill= 'white'))
+
+```
+
+***Question 2
+
+
+```{r basic graph, echo=FALSE, warning=FALSE}
+#use end date of poll
+#get it into the right format
+approval_data$date_vector <- as.Date(approval_data$enddate, "%m/%d/%Y")
+#create day value 
+approval_data$day <- c(1:length(approval_data$enddate))
+
+
+#create variables for approve and disapprove means conditional on date
+library(ggplot2)
+library(magrittr)
+library(locpol)
+library(dplyr)
+library(zoo)
+library(scales)
+
+
+
+approval_data <- approval_data %>%
+  group_by(enddate) %>%
+  mutate(
+    approval_mean = mean(approve),
+    disapproval_mean = mean(disapprove),
+    q25_approval = quantile(approve, probs=0.25),
+    q75_approval = quantile(approve, probs=.75),
+    q25_disapproval = quantile(disapprove, probs=0.25),
+    q75_disapproval = quantile(disapprove, probs=0.75)
+)
+approval_data$approve_rolling_mean <- rollmean(approval_data$approval_mean, 15, na.pad=TRUE)    
+    
+approval_data$disapprove_rolling_mean <- rollmean(approval_data$disapproval_mean,15, na.pad=TRUE)
+
+test <- '4/03/2018'
+dates <- as.Date(test, "%m/%d/%Y")
+test1 <- '4/18/2018'
+dates1 <- as.Date(test1, "%m/%d/%Y")
+test2 <- '5/05/2018' 
+dates2 <- as.Date(test2, "%m/%d/%Y")
+test3 <- '5/09/2018'
+dates3 <- as.Date(test3, "%m/%d/%Y")
+
+ggplot(approval_data, aes(x=approval_data$date_vector)) +
+  geom_point(aes(y=approve), color='forestgreen', alpha=.08) +
+  geom_point(aes(y=disapprove), color='orange2', alpha= .08) +
+  geom_line(aes(y=approve_rolling_mean), color='forestgreen') +
+  geom_line(aes(y=disapprove_rolling_mean), color='orange2') +
+  geom_text(aes(x= dates, y=55, label='54.0'), color='orange2', alpha=1) +
+  geom_text(aes(x= dates, y=41.4, label='40.4'), color='forestgreen', alpha=1) +
+  geom_text(aes(x= dates1, y=55.3, label= '%'), color='orange2', alpha=1, size=2) +
+  geom_text(aes(x= dates1, y=41.7, label= '%'), color='forestgreen', alpha=1, size=2) +
+  geom_text(aes(x= dates2, y=41.7, label= 'Approval'), color='black', alpha=1, size=2) +
+  geom_text(aes(x= dates3, y=55.3, label= 'Disapproval'), color='black', alpha=1, size=2) +
+  geom_hline(yintercept = 50) +
+  geom_vline(aes(xintercept=as.numeric(approval_data$date_vector[3646])), linetype = 'dotted') +
+  xlab('') +
+  ylab('') +
+  theme_bw() +
+  theme(panel.border = element_blank()) +
+  scale_x_date(labels = date_format(format = "%b %Y"), date_breaks = '2 months') 
+
+```
+
+
+****Question 3
+
+```{r q3, echo=FALSE, warning=FALSE}
+#Isolate US Dyads
+Dyad.Data <- Dyad.Data[Dyad.Data$ccode1 == 2,]
+#Eliminate unwanted variables
+Dyad.Data <- Dyad.Data[,c('ccode2', 'year', 'absidealdiff')]
+
+#Isolate non-US cases
+EPR <- EPR[EPR$'cowcode' != 2,]
+#Eliminate unwanted variables
+EPR <- EPR[, c('cowcode', 'year', 'lmtnest', 'exclpop', 'ethfrac')]
+#Create a common variable to match on
+Dyad.Data$ccodeyear <- paste0(Dyad.Data$ccode2, Dyad.Data$year)
+EPR$ccodeyear <- paste0(EPR$cowcode, EPR$year)
+
+
+#Merge the data (can probably do this with a loop)
+Dyad.Data$lmtnest <- EPR$lmtnest[match(Dyad.Data$ccodeyear,
+                                       EPR$ccodeyear)]
+Dyad.Data$exclpop <- EPR$exclpop[match(Dyad.Data$ccodeyear,
+                                       EPR$ccodeyear)]
+Dyad.Data$ethfrac <- EPR$ethfrac[match(Dyad.Data$ccodeyear,
+                                       EPR$ccodeyear)]
+
+
+#Clean polity and create a ccodeyear variable
+polity$ccodeyear <- polity$cyear
+
+#Fix democ and autoc variables
+
+polity$autocracy <- ifelse(polity$polity2 <= -6, 1, 0)
+polity$democracy <- ifelse(polity$polity2 >= 6, 1, 0)
+
+#merge these variables into our Dyad.Data dataselt
+
+Dyad.Data$autocracy <- polity$autocracy[match(Dyad.Data$ccodeyear,
+                                       polity$ccodeyear)]
+Dyad.Data$democracy <- polity$democracy[match(Dyad.Data$ccodeyear,
+                                       polity$ccodeyear)]
+
+#Create a variable to merge the LJI data with our Dyad.Data dataset
+LJI.Data$ccodeyear <- paste0(LJI.Data$ccode, LJI.Data$year)
+#merge the LJI variable
+
+Dyad.Data$LJI <- LJI.Data$LJI[match(Dyad.Data$ccodeyear,
+                                       LJI.Data$ccodeyear)]
+
+for(i in 3:10){
+Dyad.Data <- Dyad.Data[is.na(Dyad.Data[,i])== FALSE,]
+}
+
+#shuffle the data to get random folds
+Dyad.Data<-Dyad.Data[sample(nrow(Dyad.Data)),]
+
+#Make the folds
+Fold_data <- cut(seq(1,nrow(Dyad.Data)),breaks=30,labels=FALSE)
+#create lists to store infold and outfold data
+
+infold_datalist <- list()
+outfold_datalist <- list()
+
+#Create data lists for both infolds and outfolds
+for(i in 1:30){
+  omits <- which(Fold_data==i, arr.ind=T)
+  infold_data <- Dyad.Data[omits, ]
+  infold_datalist[[i]] <- infold_data
+  outfold_datalist[[i]] <- Dyad.Data[-omits,]
+}
+
+#create model lists
+#This returns a list of linear model objects. These objects include the whole output.
+full_models_list <- list()
+
+for(i in 1:30){
+full_models_list[[i]] <- lm(formula = absidealdiff ~ lmtnest + exclpop + ethfrac + democracy + autocracy + LJI, data = outfold_datalist[[i]])
+}
+
+stability_models_list <- list()
+
+for(i in 1:30){
+stability_models_list[[i]] <- lm(formula = absidealdiff ~ lmtnest + exclpop + ethfrac, data = outfold_datalist[[i]])
+}                                                                                              
+
+institutional_models_list <- list()
+
+for(i in 1:30){
+institutional_models_list[[i]] <- lm(formula = absidealdiff ~ democracy + autocracy + LJI, data = outfold_datalist[[i]])
+}
+
+#create predicted value lists
+#This returns a list of vectors where the objects in the vectors are predicted values
+full_predicted_list <- list()
+for(i in 1:30){
+
+  full_predicted_list[[i]] <- predict.lm(full_models_list[[i]], newdata = infold_datalist[[i]])
+}
+
+stability_predicted_list <- list()
+for(i in 1:30){
+  stability_predicted_list[[i]] <- predict.lm(stability_models_list[[i]], newdata = infold_datalist[[i]])
+}
+
+institutional_predicted_list <- list()
+for(i in 1:30){
+  institutional_predicted_list[[i]] <- predict.lm(institutional_models_list[[i]], newdata = infold_datalist[[i]])
+}
+```
+***Simulation Analysis
+****We used an institutional model to test the coefficient's predictive abilities in across simulations.
+****X1 = Autocracy X2 = Democracy X3 = LJI
+
+```{r sim analysis, echo=FALSE, warning=FALSE}
+#just using the first model from the institutional models list
+library(MASS)
+model <- institutional_models_list[[1]]
+model
+
+betaMean = coef(model)
+betaDist = vcov(model)
+betaDraws = mvrnorm(1000, betaMean, betaDist)
+
+#Set up scenarios for which we want predictions
+
+#x1: Autocracy
+
+x1Values = seq(min(outfold_datalist[[1]]$autocracy),
+               max(outfold_datalist[[1]]$autocracy), length.out = 100)
+scenario = cbind( intercept=1, x1=x1Values,
+                  x2 = mean(outfold_datalist[[1]]$democracy),
+                  x3 = mean(outfold_datalist[[1]]$LJI)
+)
+yPred = scenario %*% betaMean
+yPredUncert = scenario %*% t(betaDraws)
+
+yPredInt = apply(yPredUncert, 1, function(x){
+  quantile(x, c(.025, .975), na.rm=TRUE)}) %>% 
+  t()
+
+simAnalysis = data.frame(x1=x1Values, yPred, yPredInt)
+names(simAnalysis)[3:4] <- c('q95lo', 'q95hi')
+
+
+ggplot(simAnalysis, aes(x=x1, y=yPred)) +
+  geom_line() +
+  geom_ribbon(aes(ymin=q95lo, ymax=q95hi), alpha = .6)
+
+#x2: democracy
+
+
+x2Values = seq(min(outfold_datalist[[1]]$democracy),
+               max(outfold_datalist[[1]]$democracy), length.out = 100)
+scenario2 = cbind( intercept=1, x2=x2Values,
+                  x1 = mean(outfold_datalist[[1]]$autocracy),
+                  x3 = mean(outfold_datalist[[1]]$LJI)
+)
+yPred2 = scenario2 %*% betaMean
+yPredUncert2 = scenario2 %*% t(betaDraws)
+
+yPredInt2 = apply(yPredUncert2, 1, function(x){
+  quantile(x, c(.025, .975), na.rm=TRUE)}) %>% 
+  t()
+
+simAnalysis2 = data.frame(x2=x2Values, yPred2, yPredInt2)
+names(simAnalysis2)[3:4] <- c('q95lo', 'q95hi')
+
+
+ggplot(simAnalysis2, aes(x=x2, y=yPred2)) +
+  geom_line() +
+  geom_ribbon(aes(ymin=q95lo, ymax=q95hi), alpha = .6)
+
+
+#x3:LJI
+
+x3Values = seq(min(outfold_datalist[[1]]$LJI),
+               max(outfold_datalist[[1]]$LJI), length.out = 100)
+scenario3 = cbind( intercept=1, x3=x3Values,
+                  x1 = mean(outfold_datalist[[1]]$autocracy),
+                  x2 = mean(outfold_datalist[[1]]$democracy)
+)
+yPred3 = scenario3 %*% betaMean
+yPredUncert3 = scenario3 %*% t(betaDraws)
+
+yPredInt3 = apply(yPredUncert3, 1, function(x){
+  quantile(x, c(.025, .975), na.rm=TRUE)}) %>% 
+  t()
+
+simAnalysis3 = data.frame(x3=x3Values, yPred3, yPredInt3)
+names(simAnalysis3)[3:4] <- c('q95lo', 'q95hi')
+
+
+ggplot(simAnalysis3, aes(x=x3, y=yPred3)) +
+  geom_line() +
+  geom_ribbon(aes(ymin=q95lo, ymax=q95hi), alpha = .6)
+```
+
+
