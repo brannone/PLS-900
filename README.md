@@ -8,7 +8,7 @@
  3) topicdata.rda <- A dataset of the terms in each topic, identified by topic with a variable 1-10, one for each topic. 
 
  The code files for the final project in this repo are
- 1) 'twitter data setup'.Rda <- code for pulling tweets from twitter and putting them into a workable form.
+ 1) twitter data setup.Rda <- code for pulling tweets from twitter and putting them into a workable form.
  2) 'LDA CODE FINISH'.Rda <- code for running the LDA for each Senator and storing the results
      as well as creating the wordcloud used in the poster
 
